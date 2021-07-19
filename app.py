@@ -19,7 +19,8 @@ db.create_all()
 
 @app.route("/api/cupcakes")
 def show_cupcakes():
-    """"Get data about all cupcakes"""
+    """"Get data about all cupcakes. Respond with JSON like:
+     {cupcakes: [{id, flavor, size, rating, image}, ...]}"""
 
     cupcakes = Cupcake.query.all()
     serialized = [c.serialize() for c in cupcakes]
@@ -28,7 +29,8 @@ def show_cupcakes():
 
 @app.route("/api/cupcakes/<int:cupcake_id>")
 def show_cupcake(cupcake_id):
-    """"Get data about a cupcake"""
+    """"Get data about a cupcake. Respond with JSON like: 
+    {cupcake: {id, flavor, size, rating, image}}"""
 
     cupcake = Cupcake.query.get_or_404(cupcake_id)
     serialized = cupcake.serialize()
@@ -37,7 +39,8 @@ def show_cupcake(cupcake_id):
 
 @app.route("/api/cupcakes", methods=["POST"])
 def create_cupcake():
-    """"Create a cupcake"""
+    """"Create a cupcake. Respond with JSON like: 
+    {cupcake: {id, flavor, size, rating, image}}"""
 
     flavor = request.json["flavor"]
     size = request.json["size"]
@@ -57,7 +60,7 @@ def create_cupcake():
     return (jsonify(cupcake=serialized), 201)
 
 
-app.route("/api/cupcakes/<int:cupcake_id>", methods=["PATCH"])
+@app.route("/api/cupcakes/<int:cupcake_id>", methods=["PATCH"])
 def update_cupcake(cupcake_id):
     """Update cupcake"""
 
@@ -80,12 +83,12 @@ def update_cupcake(cupcake_id):
     return jsonify(cupcake=serialized)
 
 
-app.route("/api/cupcakes/<int:cupcake_id>", methods=["DELETE"])
+@app.route("/api/cupcakes/<int:cupcake_id>", methods=["DELETE"])
 def delete_cupcake(cupcake_id):
     """Delete cupcake"""
 
     cupcake = Cupcake.query.get_or_404(cupcake_id)
-    cupcake.delete()
+    del cupcake
     db.session.commit()
 
     return jsonify(Deleted=cupcake_id) 
