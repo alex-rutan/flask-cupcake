@@ -3,6 +3,7 @@
 from flask import Flask, render_template, request, redirect, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
 from models import db, connect_db, Cupcake
+from forms import CupcakeForm
 
 app = Flask(__name__)
 
@@ -16,6 +17,15 @@ toolbar = DebugToolbarExtension(app)
 
 connect_db(app)
 db.create_all()
+
+@app.route("/")
+def load_homepage():
+    """Loads show_cupcakes.html"""
+    cupcakes = Cupcake.query.all()
+    form = CupcakeForm()
+
+    return render_template("show_cupcakes.html", cupcakes=cupcakes, form=form)
+
 
 @app.route("/api/cupcakes")
 def show_cupcakes():
@@ -62,12 +72,13 @@ def create_cupcake():
 
 @app.route("/api/cupcakes/<int:cupcake_id>", methods=["PATCH"])
 def update_cupcake(cupcake_id):
-    """Update cupcake"""
+    """Update cupcake. Respond with JSON of the newly-updated cupcake, like this: 
+    {cupcake: {id, flavor, size, rating, image}}"""
 
     curr_cupcake = Cupcake.query.get_or_404(cupcake_id)
 
-    flavor = request.json["flavor"]
-    size = request.json["size"]
+    flavor = request.json["flavor"] or curr_cupcake.flavor
+    size = request.json["size"] or curr_cupcake.size
     rating = request.json["rating"]
     image = request.json["image"] or None
 
@@ -85,13 +96,13 @@ def update_cupcake(cupcake_id):
 
 @app.route("/api/cupcakes/<int:cupcake_id>", methods=["DELETE"])
 def delete_cupcake(cupcake_id):
-    """Delete cupcake"""
+    """Delete cupcake. Respond with JSON like {message: "Deleted"}"""
 
     cupcake = Cupcake.query.get_or_404(cupcake_id)
-    del cupcake
+    db.session.delete(cupcake)
     db.session.commit()
 
-    return jsonify(Deleted=cupcake_id) 
+    return jsonify(message="Deleted") 
 
 
 

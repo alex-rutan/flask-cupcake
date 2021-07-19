@@ -1,5 +1,7 @@
 from unittest import TestCase
 
+from werkzeug.test import Client
+
 from app import app
 from models import db, Cupcake
 
@@ -107,3 +109,64 @@ class CupcakeViewsTestCase(TestCase):
             })
 
             self.assertEqual(Cupcake.query.count(), 2)
+
+    def test_update_cupcake(self):
+        with app.test_client() as client:
+            url = f"/api/cupcakes/{self.cupcake.id}"
+            resp = client.patch(url, json={
+                                            "flavor": "strawberry",
+                                            "size": "small",
+                                            "rating": 5,
+                                            "image": "http://test.com/cupcake.jpg"
+                                          })
+
+            self.assertEqual(resp.status_code, 200)
+
+            data = resp.json
+
+            self.assertEqual(data, {
+                "cupcake": {
+                    "id": self.cupcake.id,
+                    "flavor": "strawberry",
+                    "size": "small",
+                    "rating": 5,
+                    "image": "http://test.com/cupcake.jpg"
+                }
+            })
+            self.assertEqual(Cupcake.query.count(), 1)
+
+
+    def test_delete_cupcake(self):
+        with app.test_client() as client:
+            url = f"/api/cupcakes/{self.cupcake.id}"
+            resp = client.delete(url)
+
+            self.assertEqual(resp.status_code, 200)
+
+            data = resp.json
+            self.assertEqual(data, {"message": "Deleted"})
+            self.assertEqual(Cupcake.query.count(), 0)
+
+    def test_get_cupcake_not_exist(self):
+        with app.test_client() as client:
+            url = "/api/cupcakes/0"
+            resp = client.get(url)
+            
+            self.assertEqual(resp.status_code, 404)
+            self.assertIn("404 NOT FOUND", resp)
+
+    def test_patch_cupcake_not_exist(self):
+        with app.test_client() as client:
+            url = "/api/cupcakes/0"
+            resp = client.patch(url, json=CUPCAKE_DATA_2)
+
+            self.assertEqual(resp.status_code, 404)
+            self.assertIn("404 NOT FOUND", resp)
+
+    def test_delete_cupcake_not_exist(self):
+        with app.test_client() as client:
+            url = "/api/cupcakes/0"
+            resp = client.delete(url)
+
+            self.assertEqual(resp.status_code, 404)
+            self.assertIn("404 NOT FOUND", resp)

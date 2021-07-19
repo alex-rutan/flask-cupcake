@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %} Cupcakes Details {% endblock %}
+
+{% block content %}
+
+  <h1>See all the Cupcakes!</h1>
+
+  <ul>
+    {% for cupcake in cupcakes %}
+      <li>
+        <a href="/cupcakes/{{ cupcake.id }}">{{ cupcake.flavor }}</a>
+      </li>
+    {% endfor %}
+  </ul>
+
+  <form id="new-cupcake-form" class="form-group text-center" method="POST">
+    {{ form.hidden_tag() }}
+
+    {% for field in form
+          if field.widget.input_type != 'hidden' %}
+
+        <div class="form-group-row">
+        {{ field.label }}
+        {{ field }}
+
+        {% for error in field.errors %}
+          {{ errors }}
+        {% endfor %}
+      </div>
+
+    {% endfor %}
+
+    <button class="btn btn-primary btn-lg text-left mt-3">
+      Add Cupcake
+    </button>
+  </form>
+
+{% endblock %}
