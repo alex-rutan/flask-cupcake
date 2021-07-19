@@ -20,11 +20,10 @@ db.create_all()
 
 @app.route("/")
 def load_homepage():
-    """Loads show_cupcakes.html"""
-    cupcakes = Cupcake.query.all()
+    """Loads index.html"""
     form = CupcakeForm()
 
-    return render_template("show_cupcakes.html", cupcakes=cupcakes, form=form)
+    return render_template("index.html", form=form)
 
 
 @app.route("/api/cupcakes")

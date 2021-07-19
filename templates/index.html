@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Cupcakes</title>
+  <link rel="stylesheet" href="https://bootswatch.com/4/lumen/bootstrap.css">
+</head>
+<body>
+
+  <div class="container">
+    <div class="row">
+        <div class="col">
+
+          <h1>See all the Cupcakes!</h1>
+          
+          <ul class="cupcakes-list">
+          
+          </ul>
+          
+          <form id="new-cupcake-form" class="form-group text-center" method="POST">
+            {{ form.hidden_tag() }}
+          
+            {% for field in form
+            if field.widget.input_type != 'hidden' %} 
+          
+            <div class="form-group-row">
+              {{ field.label }}
+              {{ field }}
+          
+              {% for error in field.errors %}
+              {{ errors }}
+              {% endfor %}
+            </div>
+          
+            {% endfor %}
+          
+            <button class="btn btn-primary btn-lg text-left mt-3">
+              Add Cupcake
+            </button>
+          </form>
+
+        </div>
+      </div>
+  </div>
+  <script src="http://unpkg.com/jquery"></script>
+  <script src="https://unpkg.com/axios/dist/axios.js"></script>
+  <script src="/static/cupcake.js"></script>
+
+</body>
+</html>
