@@ -25,6 +25,13 @@ def load_homepage():
 
     return render_template("index.html", form=form)
 
+@app.route("/cupcakes/<int:cupcake_id>")
+def display_cupcake(cupcake_id):
+    """Display a cupcake detail"""
+
+    cupcake = Cupcake.query.get_or_404(cupcake_id)
+
+    return render_template("show_cupcake.html", cupcake=cupcake)
 
 @app.route("/api/cupcakes")
 def show_cupcakes():
@@ -50,7 +57,7 @@ def show_cupcake(cupcake_id):
 def create_cupcake():
     """"Create a cupcake. Respond with JSON like: 
     {cupcake: {id, flavor, size, rating, image}}"""
-
+    
     flavor = request.json["flavor"]
     size = request.json["size"]
     rating = request.json["rating"]
@@ -76,15 +83,25 @@ def update_cupcake(cupcake_id):
 
     curr_cupcake = Cupcake.query.get_or_404(cupcake_id)
 
-    flavor = request.json["flavor"] or curr_cupcake.flavor
-    size = request.json["size"] or curr_cupcake.size
-    rating = request.json["rating"]
-    image = request.json["image"] or None
+    curr_cupcake.flavor = request.json.get("flavor", curr_cupcake.flavor)
+    curr_cupcake.size = request.json.get("size", curr_cupcake.size)
+    curr_cupcake.rating = request.json.get("rating", curr_cupcake.rating)
 
-    curr_cupcake.flavor = flavor
-    curr_cupcake.size = size
-    curr_cupcake.rating = rating
-    curr_cupcake.image = image
+    image = request.json.get("image", None)
+    if image is None or image == "":
+        curr_cupcake.image = None
+    else:
+        curr_cupcake.image = image
+
+    # flavor = request.json["flavor"] or curr_cupcake.flavor
+    # size = request.json["size"] or curr_cupcake.size
+    # rating = request.json["rating"]
+    # image = request.json["image"] or None
+
+    # curr_cupcake.flavor = flavor
+    # curr_cupcake.size = size
+    # curr_cupcake.rating = rating
+    # curr_cupcake.image = image
 
     db.session.commit()
 

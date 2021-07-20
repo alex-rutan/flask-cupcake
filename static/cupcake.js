@@ -11,11 +11,28 @@ async function start() {
     displayCupcakes(cupcakes);
 }
 
+/** Get Cupcakes function */
+
+/** Generate cupcake HTML 
+ * returns jquery of cupcake
+*/
+function generateCupcake(cupcake) {
+    return ` 
+        <div data-cupcake-id=${cupcake.id} class="col-4">
+            <li>
+            Flavor: ${cupcake.flavor} | Size: ${cupcake.size} | Rating: ${cupcake.rating}
+            </li>
+            <img class="Cupcake-img" src="${cupcake.image}" alt="No image provided" width="200px">
+        </div>
+   `;
+}
+
 /** Display cupcakes list */
 function displayCupcakes(cupcakes) {
     $cupcakes.empty();
+    console.log(cupcakes)
     for (let cupcake of cupcakes) {
-        $cupcakes.append(`<li>${cupcake.flavor}</li>`);
+        $cupcakes.append(generateCupcake(cupcake));
     }
 }
 
@@ -27,21 +44,30 @@ async function handleFormSubmit(evt) {
     let size = $("#size").val();
     let rating = $("#rating").val();
     let image = $("#image").val();
-
-    const response = await axios({
-        url: "/api/cupcakes",
-        method: "POST",
-        data: { cupcake: {
+    
+    const response = await axios.post(
+        "http://localhost:5000/api/cupcakes",
+        {
             flavor,
             size,
             rating,
             image
-        }}
-    });  
+        }
+    );  
+    // const response = await axios.post({
+    //     url: "/api/cupcakes",
+    //     data: {
+    //         flavor,
+    //         size,
+    //         rating,
+    //         image
+    //     }
+    // });  
     
-    new_cupcake = response.data.cupcake;
-    
-    $cupcakes.append(`<li>${new_cupcake.flavor}</li>`);
+    let new_cupcake = response.data.cupcake;
+    console.log("made it pasttt", new_cupcake);
+    $cupcakes.append(generateCupcake(cupcake));
+    $form.trigger("reset");
 }
 
 $form.on("submit", handleFormSubmit);
